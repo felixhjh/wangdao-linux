@@ -3,11 +3,10 @@ void send_fd(int socketpipew,int fd)
 {
 	struct msghdr msg;
 	memset(&msg,0,sizeof(msg));
-	char buf1[10]="xiongda";
 	char buf2[10]="da";
 	struct iovec iov[2];
-	iov[0].iov_base=buf1;
-	iov[0].iov_len=5;
+	iov[0].iov_base=&fd;
+	iov[0].iov_len=4;
 	iov[1].iov_base=buf2;
 	iov[1].iov_len=2;
 	msg.msg_iov=iov;
@@ -19,6 +18,10 @@ void send_fd(int socketpipew,int fd)
 	cmsg->cmsg_level=SOL_SOCKET;
 	cmsg->cmsg_type=SCM_RIGHTS;
 	*(int *)CMSG_DATA(cmsg)=fd;
+	if(-1==fd)
+	{
+		*(int *)CMSG_DATA(cmsg)=0;
+	}
 	msg.msg_control=cmsg;
 	msg.msg_controllen=len;
 	int ret;
@@ -34,11 +37,11 @@ void recv_fd(int socketpiper,int *fd)
 {
 	struct msghdr msg;
 	memset(&msg,0,sizeof(msg));
-	char buf1[10]={0};
+	int exitflag;
 	char buf2[10]={0};
 	struct iovec iov[2];
-	iov[0].iov_base=buf1;
-	iov[0].iov_len=5;
+	iov[0].iov_base=&exitflag;
+	iov[0].iov_len=4;
 	iov[1].iov_base=buf2;
 	iov[1].iov_len=2;
 	msg.msg_iov=iov;
@@ -59,4 +62,8 @@ void recv_fd(int socketpiper,int *fd)
 		return;
 	}
 	*fd=*(int*)CMSG_DATA(cmsg);
+	if(-1==exitflag)
+	{
+		*fd=-1;
+	}
 }

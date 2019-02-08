@@ -31,13 +31,19 @@ typedef struct{
 	int fds;//子进程的管道对端
 	short busy;//0代表子进程不忙碌，1代表子进程忙碌
 }proData;
-
+// the protocol of the application layer
+typedef struct{
+	int dataLen;
+	char buf[1000];
+}train;
+#define DOWNFILE "file"
 void makeChild(proData *,int );
 void childHandle(int);
 int tcpInit(int *,char *,char *);
 void send_fd(int,int);
 void recv_fd(int,int*);
-
-
+int tranFile(int);
+int send_n(int, char *,int);
+int recv_n(int, char *,int);
 
 

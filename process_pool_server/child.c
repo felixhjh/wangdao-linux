@@ -27,8 +27,11 @@ void childHandle(int fds)
 	while(1)
 	{
 		recv_fd(fds,&new_fd);
-		printf("I am child,get task,send file start\n");
-		close(new_fd);
+		if(-1==new_fd)
+		{
+			exit(0);
+		}
+		tranFile(new_fd);
 		write(fds,&flag,sizeof(char));
 	}
 }
